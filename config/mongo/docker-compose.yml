@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  mongo:
+    hostname: ${MONGO_CONTAINER_NAME}
+    container_name: ${MONGO_CONTAINER_NAME}
+    image: ${KEYFILE_MONGO_IMAGE:-"mongo-keyfile"}:latest
+    volumes:
+      - /root/mongodb-repl/${MONGO_CONTAINER_NAME}/data:/data/db
+    expose:
+      - "${MONGO_PORT}"
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    env_file:
+      - docker-secrets.env
+    restart: always
+    command: ["mongod", "--bind_ip_all", "--port", "${MONGO_PORT}", "--replSet", "${MONGO_RS_ID:-rs}", "--keyFile", "/data/key/replica-set.key"]
+    networks:
+      default:
+        aliases:
+          - ${MONGO_ALIAS}
+networks:
+  default:
+    external: true
+    name: universal_network

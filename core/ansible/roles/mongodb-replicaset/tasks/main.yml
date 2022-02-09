@@ -1,0 +1,108 @@
+---
+# tasks file for roles/mongodb-replicaset
+- name: Create root configuration directory
+  become: yes
+  become_user: root
+  file:
+    state: directory
+    path: "{{ remote_config_dir }}"
+
+- name: Copy config file to remote root configuration
+  become: yes
+  become_user: root
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: "{{ dockerfile_path }}"
+      dest: "{{ remote_config_dir }}/Dockerfile"
+      mode: "preserve"
+    - src: "{{ docker_compose_path }}"
+      dest: "{{ remote_config_dir }}/docker-compose.yml"
+      mode: "preserve"
+    - src: "{{ docker_secrets_path }}"
+      dest: "{{ remote_config_dir }}/docker-secrets.env"
+      mode: "preserve"
+
+- name: Build a keyfile mongo image
+  become: yes
+  become_user: root
+  ansible.builtin.shell: |
+    DOCKER_IMG=$(docker image ls -a | grep {{ keyfile_mongo_image_name }} | head -1)
+    echo $DOCKER_IMG
+    if [[ -z "$DOCKER_IMG" ]]
+    then
+      docker build -t "{{ keyfile_mongo_image_name }}:latest" "{{ remote_config_dir }}"
+    fi;
+  args:
+    executable: /bin/bash
+
+- name: Set up mongo containers
+  become: yes
+  become_user: root
+  ansible.builtin.shell: |
+    export KEYFILE_MONGO_IMAGE={{ keyfile_mongo_image_name }}
+    export MONGO_CONTAINER_NAME=mongo-{{ item.port }}
+    export MONGO_PORT={{ item.port }}
+    export MONGO_ALIAS="$MONGO_CONTAINER_NAME.{{ root_domain }}"
+    export MONGO_RS_ID={{ mongo_rs_id }}
+
+    {{ remote_docker_compose_exec }} -f {{ remote_config_dir }}/docker-compose.yml -p mongo-repl-$MONGO_CONTAINER_NAME up  -d;
+
+    unset KEYFILE_MONGO_IMAGE
+    unset MONGO_CONTAINER_NAME
+    unset MONGO_PORT
+    unset MONGO_ALIAS
+    unset MONGO_RS_ID
+  args:
+    executable: /bin/bash
+  loop: "{{ mongo_config }}"
+
+- name: Pause 30s for the mongo containers to be ready
+  pause:
+    seconds: 30
+
+- name: Set up replica-set
+  become: yes
+  become_user: root
+  vars:
+    sorted_config: "{{ mongo_config | sort(attribute='priority') | reverse }}"
+    primary_config: "{{ sorted_config[0] }}"
+  ansible.builtin.shell: |
+    PRIMARY_MONGO_CONTAINER="mongo-{{ primary_config.port }}"
+    MONGO_CONTAINER_NAME="mongo-{{ item.port }}"
+    MONGO_PORT={{ item.port }}
+    MONGO_ALIAS="$MONGO_CONTAINER_NAME.{{ root_domain }}"
+    MONGO_PRIORITY={{ item.priority }}
+    MONGO_RS_ID={{ mongo_rs_id }}
+    MONGO_RS_ID=${MONGO_RS_ID:-rs}
+
+    if [[ "{{ item.arbiter }}" == "True" ]]
+    then
+      MONGO_ARBITER=true
+    else
+      MONGO_ARBITER=false
+    fi;
+
+    source "{{ remote_config_dir }}/docker-secrets.env";
+
+    initRsScript="if(!rs.status().ok){rs.initiate({_id: '$MONGO_RS_ID', version: 1, members: [{ _id: 0, host: '$MONGO_ALIAS:$MONGO_PORT', priority: $MONGO_PRIORITY }]});}"
+    addNodeScript="var ok=false; var newHost='$MONGO_ALIAS:$MONGO_PORT'; for(var member of rs.conf().members){ok|=member.host===newHost;}; if(!ok){db.adminCommand({ setDefaultRWConcern : 1, defaultWriteConcern: {w: 'majority'} });if($MONGO_ARBITER){rs.addArb(newHost);}else{rs.add({host: newHost, priority: $MONGO_PRIORITY});};}"
+
+    if [[ "{{ config_idx }}" == "0" ]]
+    then
+      docker exec "$PRIMARY_MONGO_CONTAINER" \
+      bash -c \
+      "mongo \"mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin\" --eval \"$initRsScript\"";
+    else
+      docker exec "$PRIMARY_MONGO_CONTAINER" \
+      bash -c \
+      "mongo \"mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin\" --eval \"$addNodeScript\"";
+    fi;
+  args:
+    executable: /bin/bash
+  loop: "{{ sorted_config }}"
+  loop_control:
+    index_var: config_idx
+    pause: 5

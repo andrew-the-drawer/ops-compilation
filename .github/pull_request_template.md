@@ -1,18 +1,10 @@
-<!-- Thank you for contributing a pull request!>
-
-#### Summary
-<!--
-A description of what this pull request does.
--->
-
+<!-- Thank you for contributing a pull request! -->
 ### Summary
 
 
 ### Github issues
 <!--
-If this pull request addresses an feature requests/bugs, please link the relevant GitHub issue, e.g.
-
--->
+If this pull request addresses an feature requests/bugs, please link the relevant GitHub issue-->
 
 ### Release Note
 <!--
