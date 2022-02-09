@@ -5,7 +5,10 @@
   become_user: root
   file:
     state: directory
-    path: "{{ remote_config_dir }}"
+    path: "{{ item }}"
+  loop:
+    - "{{ remote_config_dir }}"
+    - "{{ remote_backup_dir }}"
 
 - name: Copy config file to remote root configuration
   become: yes
@@ -24,6 +27,18 @@
     - src: "{{ docker_secrets_path }}"
       dest: "{{ remote_config_dir }}/docker-secrets.env"
       mode: "preserve"
+
+- name: Copy template to remote root configuration
+  become: yes
+  become_user: root
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: "{{ role_path }}/templates/s3-backup-restore.j2"
+      dest: "{{ remote_config_dir }}/s3-backup-restore.sh"
+      mode: "+x"
 
 - name: Build a keyfile mongo image
   become: yes
@@ -85,8 +100,6 @@
       MONGO_ARBITER=false
     fi;
 
-    source "{{ remote_config_dir }}/docker-secrets.env";
-
     initRsScript="if(!rs.status().ok){rs.initiate({_id: '$MONGO_RS_ID', version: 1, members: [{ _id: 0, host: '$MONGO_ALIAS:$MONGO_PORT', priority: $MONGO_PRIORITY }]});}"
     addNodeScript="var ok=false; var newHost='$MONGO_ALIAS:$MONGO_PORT'; for(var member of rs.conf().members){ok|=member.host===newHost;}; if(!ok){db.adminCommand({ setDefaultRWConcern : 1, defaultWriteConcern: {w: 'majority'} });if($MONGO_ARBITER){rs.addArb(newHost);}else{rs.add({host: newHost, priority: $MONGO_PRIORITY});};}"
 
@@ -94,11 +107,11 @@
     then
       docker exec "$PRIMARY_MONGO_CONTAINER" \
       bash -c \
-      "mongo \"mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin\" --eval \"$initRsScript\"";
+      'mongosh "mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin" --eval "$initRsScript"';
     else
       docker exec "$PRIMARY_MONGO_CONTAINER" \
       bash -c \
-      "mongo \"mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin\" --eval \"$addNodeScript\"";
+      'mongosh "mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin" --eval "$addNodeScript"';
     fi;
   args:
     executable: /bin/bash

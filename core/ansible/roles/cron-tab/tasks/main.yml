@@ -1,0 +1,28 @@
+---
+# tasks file for ansible/roles/deploy-cron
+- name: Check the cron config exists
+  stat:
+    path: "{{ cron_config_file }}"
+  register: cron_config_file_meta  
+  delegate_to: 127.0.0.1
+  become: no
+  check_mode: no
+    
+- name: Add cron config variables
+  include_vars:
+    file: "{{ cron_config_file }}"
+  when: cron_config_file_meta.stat.exists == True
+
+- name: Build and deploy cron
+  become: yes
+  become_user: root
+  ansible.builtin.cron:
+    name: "{{ item.name }}"
+    minute: "{{ item.minute or '*' }}"
+    hour: "{{ item.hour or '*' }}"
+    day: "{{ item.day or '*' }}"
+    month: "{{ item.month or '*' }}"
+    weekday: "{{ item.weekday or '*' }}"
+    job: "{{ item.command }}"
+    state: "{{ item.state or 'present' }}"
+  loop: "{{ cron_config or [] }}"

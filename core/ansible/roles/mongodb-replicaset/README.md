@@ -20,6 +20,10 @@ Role Variables
 - root_domain: # if the value is db.example.com, then mongo alias would look like mongo-27017.db.example.com 
 - remote_docker_compose_exec: # remote path point to docker-compose executable script (/usr/local/bin/docker-compose)
 - mongo_rs_id: # name or ID of replica-set (default to rs)
+- s3_backup_bucket: # S3 bucket to store backup file of mongo
+- aws_dir: #remote directory contains aws credentials and config ($HOME/.aws)
+- remote_backup_dir: # directory to store backup file
+- aws_profile: # aws named profile
 ```
 
 Dependencies
@@ -54,6 +58,10 @@ Including an example of how to use your role (for instance, with variables passe
         root_domain: db.example.com
         remote_docker_compose_exec: /usr/local/bin/docker-compose
         mongo_rs_id: rs
+        s3_backup_bucket: db-backup
+        aws_dir: /root/.aws
+        remote_backup_dir: /root/mongodb-repl/backup
+        aws_profile: profile-name
 ```
 
 License
