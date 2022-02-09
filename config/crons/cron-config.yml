@@ -1,0 +1,11 @@
+cron_config:
+  - name: backup test DB in Mongo
+    minute: 30
+    hour: 1
+    weekday:
+    day:
+    month:
+    state: present
+    command: "DB_NAME=test MONGO_ACTION=backup /root/mongodb-repl/s3-backup-restore.sh"
+    
+    

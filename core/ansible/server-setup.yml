@@ -27,3 +27,20 @@
         root_domain: db.example.com
         remote_docker_compose_exec: "/usr/local/bin/docker-compose"
         mongo_rs_id: rs
+        s3_backup_bucket: db-backup
+        aws_dir: /root/.aws
+        remote_backup_dir: /root/mongodb-repl/backup
+        aws_profile: profile
+    - role: aws-cli
+      vars:
+        aws_cli_install_dir: /usr/local/aws-cli
+        aws_cli_bin: /usr/local/bin/aws
+        aws_profile: profile-name
+        aws_region: ap-southeast-1
+        ec2_instance_role_arn: arn:aws:iam::<account_id>:role/<role_name>
+        aws_dir: /root/.aws
+      tags:
+        - ec2
+    - role: cron-tab
+      vars:
+        cron_config_file: "{{ lookup('env','PWD') }}/config/crons/cron-config.yml"
