@@ -1,0 +1,29 @@
+---
+- name: Set up server
+  hosts: sample-server
+  roles:
+    - role: docker
+      vars:
+        docker_compose_dest: /usr/local/bin
+      tags:
+        - centos
+    - role: mongodb-replicaset
+      vars:
+        remote_config_dir: /root/mongodb-repl
+        dockerfile_path: "{{ lookup('env','PWD') }}/config/mongo/Dockerfile"
+        docker_compose_path: "{{ lookup('env', 'PWD') }}/config/mongo/docker-compose.yml"
+        keyfile_mongo_image_name: "mongo-keyfile"
+        docker_secrets_path: "{{ lookup('env', 'PWD') }}/config/mongo/docker-secrets.env"
+        mongo_config:
+          - port: 27017
+            priority: 10
+            arbiter: no
+          - port: 27018
+            priority: 9
+            arbiter: no
+          - port: 27019
+            priority: 8
+            arbiter: yes
+        root_domain: db.example.com
+        remote_docker_compose_exec: "/usr/local/bin/docker-compose"
+        mongo_rs_id: rs

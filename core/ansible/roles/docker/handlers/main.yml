@@ -1,0 +1,17 @@
+---
+# handlers file for roles/docker
+- name: Start docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+  become_user: root
+
+- name: Create universal bridge network
+  become: yes
+  become_user: root
+  ansible.builtin.shell: |
+    docker network create -d bridge universal_network
+  args:
+    executable: /bin/bash

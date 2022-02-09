@@ -1,0 +1,47 @@
+---
+# tasks file for roles/docker
+# for now I only support CentOS installation. For further support on other OS, feel free to contribute
+- name: Install yum utils
+  yum:
+    name: yum-utils
+    state: latest
+  become: yes
+  become_user: root
+  tags:
+    - centos
+
+- name: Add docker-ce to package manager
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+  become: yes
+  become_user: root
+  tags:
+    - centos
+
+- name: Install docker packages
+  become: yes
+  become_user: root
+  yum:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+  notify:
+    - Start docker service
+    - Create universal bridge network
+  tags:
+    - centos
+
+- name: Install docker compose
+  become: yes
+  become_user: root
+  ansible.builtin.shell: |
+    curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o {{ docker_compose_dest }}/docker-compose;
+    chmod +x {{ docker_compose_dest }}/docker-compose
+  args:
+    executable: /bin/bash
+  tags:
+    - always
+
