@@ -5,7 +5,7 @@ restore_filename=$RESTORE_FILENAME
 database=$DB_NAME
 action=$MONGO_ACTION
 
-s3_directory=/mongodb/$database
+s3_base_path={{ s3_backup_base_path }}/$database
 
 {% for mongo_conf in mongo_config %}
 current_container_name="mongo-{{ mongo_conf.port }}"
@@ -35,7 +35,7 @@ then
   -v {{ remote_backup_dir }}:/mongodb-backup \
   -v {{ aws_dir }}:/root/.aws:ro \
   illya/aws-cli \
-  s3 cp /mongodb-backup/$dump_file.gz s3://{{ s3_backup_bucket }}$s3_directory/$dump_file.gz --profile={{ aws_profile }};
+  s3 cp /mongodb-backup/$dump_file.gz s3://$s3_base_path/$dump_file.gz --profile={{ aws_profile }};
 
   rm -rf {{ remote_backup_dir }}/**;
   docker exec $main_container bash -c 'rm -rf /root/mongodb-backup';
@@ -48,7 +48,7 @@ else
   -v {{ remote_backup_dir }}:/mongodb-backup \
   -v {{ aws_dir }}:/root/.aws:ro \
   illya/aws-cli \
-  s3 cp s3://{{ s3_backup_bucket }}$s3_directory/$restore_filename.gz /mongodb-backup/ --profile={{ aws_profile }};
+  s3 cp s3://$s3_base_path/$restore_filename.gz /mongodb-backup/ --profile={{ aws_profile }};
 
   docker cp {{ remote_backup_dir }}/$restore_filename.gz $main_container:/root/mongodb-backup/$restore_filename.gz
 
