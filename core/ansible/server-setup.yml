@@ -27,10 +27,10 @@
         root_domain: db.example.com
         remote_docker_compose_exec: "/usr/local/bin/docker-compose"
         mongo_rs_id: rs
-        s3_backup_bucket: db-backup
+        s3_backup_base_path: db-backup/mongodb/test-env
         aws_dir: /root/.aws
         remote_backup_dir: /root/mongodb-repl/backup
-        aws_profile: profile
+        aws_profile: profile-name
     - role: aws-cli
       vars:
         aws_cli_install_dir: /usr/local/aws-cli

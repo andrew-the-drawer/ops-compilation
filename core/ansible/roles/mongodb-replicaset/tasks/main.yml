@@ -105,11 +105,11 @@
 
     if [[ "{{ config_idx }}" == "0" ]]
     then
-      docker exec "$PRIMARY_MONGO_CONTAINER" \
+      docker exec -e initRsScript="$initRsScript" "$PRIMARY_MONGO_CONTAINER" \
       bash -c \
       'mongosh "mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin" --eval "$initRsScript"';
     else
-      docker exec "$PRIMARY_MONGO_CONTAINER" \
+      docker exec -e addNodeScript="$addNodeScript" "$PRIMARY_MONGO_CONTAINER" \
       bash -c \
       'mongosh "mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@127.0.0.1:{{ primary_config.port }}/?authSource=admin" --eval "$addNodeScript"';
     fi;
