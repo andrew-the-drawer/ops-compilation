@@ -27,7 +27,7 @@ then
   docker exec \
   -e database=$database -e host_list=$host_list -e dump_file=$dump_file \
   $main_container bash -c \
-  'mkdir /root/mongodb-backup && mongodump --uri="mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@$host_list/$database?authSource=admin&replicaSet=rs&ssl=false"  --archive="/root/mongodb-backup/$dump_file.gz" --gzip';
+  'mkdir /root/mongodb-backup && mongodump --uri="mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@$host_list/$database?authSource=admin&replicaSet={{ mongo_rs_id }}&ssl=false"  --archive="/root/mongodb-backup/$dump_file.gz" --gzip';
 
   docker cp $main_container:/root/mongodb-backup/$dump_file.gz {{ remote_backup_dir }}/$dump_file.gz;
 
@@ -55,7 +55,7 @@ else
   docker exec \
   -e database=$database -e host_list=$host_list -e restore_file=$restore_filename \
   $main_container bash -c \
-  'mongorestore --uri="mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@$host_list/$database?authSource=admin&replicaSet=rs&ssl=false"  --archive="/root/mongodb-backup/$restore_file.gz" --gzip';
+  'mongorestore --uri="mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@$host_list/$database?authSource=admin&replicaSet={{ mongo_rs_id }}&ssl=false"  --archive="/root/mongodb-backup/$restore_file.gz" --gzip';
 
   rm -rf {{ remote_backup_dir }}/**;
   docker exec $main_container bash -c 'rm -rf /root/mongodb-backup';
