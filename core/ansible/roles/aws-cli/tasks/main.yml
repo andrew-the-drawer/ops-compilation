@@ -3,8 +3,6 @@
 # Currently I just support for CentOS setup. For other OS environment feel free to contribute
 # The post-setup is dedicated to EC2. For other cloud server type on GCP or Azure, feel free to contribute
 - name: Install unzip on CentOS
-  become: yes
-  become_user: root
   yum:
     name:
       - unzip
@@ -14,8 +12,6 @@
     - centos
 
 - name: Download the awscli bundle.
-  become: yes
-  become_user: root
   get_url:
     url:  https://s3.amazonaws.com/aws-cli/awscli-bundle.zip
     dest: /tmp/awscli-bundle.zip
@@ -24,8 +20,6 @@
     - cli
 
 - name: Unarchive the aws installer
-  become: yes
-  become_user: root
   unarchive:
     src: /tmp/awscli-bundle.zip
     dest: /tmp
@@ -37,8 +31,6 @@
     - cli
 
 - name: Install aws-cli executable
-  become: yes
-  become_user: root
   ansible.builtin.shell: |
     /tmp/awscli-bundle/install -i {{ aws_cli_install_dir }} -b {{ aws_cli_bin }}
   args:
@@ -49,8 +41,6 @@
     - cli
 
 - name: Set up AWS profile on EC2 using docker
-  become: yes
-  become_user: root
   tags:
     - ec2
   ansible.builtin.template:

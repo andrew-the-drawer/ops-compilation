@@ -14,8 +14,6 @@
   when: cron_config_file_meta.stat.exists == True
 
 - name: Build and deploy cron
-  become: yes
-  become_user: root
   ansible.builtin.cron:
     name: "{{ item.name }}"
     minute: "{{ item.minute or '*' }}"

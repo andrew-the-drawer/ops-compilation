@@ -27,7 +27,7 @@ then
   docker exec \
   -e database=$database -e host_list=$host_list -e dump_file=$dump_file \
   $main_container bash -c \
-  'mkdir /root/mongodb-backup && mongodump --uri="mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@$host_list/$database?authSource=admin&replicaSet={{ mongo_rs_id }}&ssl=false"  --archive="/root/mongodb-backup/$dump_file.gz" --gzip';
+  'mkdir -p /root/mongodb-backup && mongodump --uri="mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@$host_list/$database?authSource=admin&replicaSet={{ mongo_rs_id }}&ssl=false"  --archive="/root/mongodb-backup/$dump_file.gz" --gzip';
 
   docker cp $main_container:/root/mongodb-backup/$dump_file.gz {{ remote_backup_dir }}/$dump_file.gz;
 
@@ -42,7 +42,7 @@ then
 else
   echo "Start restoring the database";
 
-  docker exec $main_container bash -c 'mkdir /root/mongodb-backup';
+  docker exec $main_container bash -c 'mkdir -p /root/mongodb-backup';
   
   docker run --rm \
   -v {{ remote_backup_dir }}:/mongodb-backup \

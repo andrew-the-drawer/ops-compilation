@@ -1,6 +1,8 @@
 ---
 - name: Set up server
   hosts: sample-server
+  become: yes
+  become_user: root
   roles:
     - role: docker
       vars:
