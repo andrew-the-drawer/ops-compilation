@@ -1,0 +1,40 @@
+{
+  "name": "ops-compilation",
+  "version": "1.0.0",
+  "description": "All-in-1 repositories with dev-ops stacks, modules,... compilation",
+  "main": "index.js",
+  "scripts": {
+    "format:check": "prettier --check **/*.{ts,js}",
+    "format:write": "prettier --write **/*.{ts,js}",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lantrungseo/ops-compilation.git"
+  },
+  "author": "Trung (Andrew) Nguyen",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/config-conventional": "^17.4.2",
+    "@types/lodash": "^4.14.191",
+    "@types/minimist": "^1.2.2",
+    "commitlint": "^17.4.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.3"
+  },
+  "dependencies": {
+    "cdktf": "^0.14.3",
+    "cdktf-cli": "^0.14.3",
+    "constructs": "^10.1.224",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.7",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "lint-staged": {
+    "**/*.{ts,js}": [
+      "prettier --write"
+    ]
+  }
+}
