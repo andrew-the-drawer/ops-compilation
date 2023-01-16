@@ -1,0 +1,14 @@
+{
+  "app": "npx ts-node main.ts",
+  "language": "typescript",
+  "output": "cdktf.out",
+  "sendCrashReport": true,
+  "terraformProviders": [
+    {
+      "name": "aws",
+      "source": "hashicorp/aws",
+      "version": "~> 4.50.0"
+    }
+  ],
+  "projectId": "50fcac82-6ce7-457b-8c19-20ad0a321351"
+}
