@@ -5,6 +5,7 @@ export type TALBConstructConfig = {
   albName: string;
   subnetIds: string[];
   securityGroupIds: string[];
+  certArn: string;
 };
 
 export class ALBConstruct extends Construct {
@@ -22,6 +23,7 @@ export class ALBConstruct extends Construct {
       port: 443,
       protocol: 'HTTPS',
       sslPolicy: 'ELBSecurityPolicy-2016-08',
+      certificateArn: config.certArn,
       defaultAction: [
         {
           type: 'fixed-response',

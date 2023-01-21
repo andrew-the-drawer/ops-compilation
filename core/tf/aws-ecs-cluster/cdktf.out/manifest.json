@@ -1,0 +1,21 @@
+{
+  "version": "0.14.3",
+  "stacks": {
+    "aws-ecs-cluster-module": {
+      "name": "aws-ecs-cluster-module",
+      "constructPath": "aws-ecs-cluster-module",
+      "workingDirectory": "stacks/aws-ecs-cluster-module",
+      "synthesizedStackPath": "stacks/aws-ecs-cluster-module/cdk.tf.json",
+      "annotations": [],
+      "dependencies": []
+    },
+    "aws-ecs-cluster": {
+      "name": "aws-ecs-cluster",
+      "constructPath": "aws-ecs-cluster",
+      "workingDirectory": "stacks/aws-ecs-cluster",
+      "synthesizedStackPath": "stacks/aws-ecs-cluster/cdk.tf.json",
+      "annotations": [],
+      "dependencies": []
+    }
+  }
+}
