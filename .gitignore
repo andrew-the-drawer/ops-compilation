@@ -35,6 +35,10 @@ lerna-debug.log*
 
 .env
 
+# terraform
 core/tf/*/.gen
-core/tf/*/cdktf.out
-core/tf/*/*.tfvars
+core/tf/*/cdktf.out/stacks/*/cdk.tf.json
+core/tf/*/cdktf.out/stacks/*/.terraform/
+core/tf/*/cdktf.out/stacks/*/terraform.tfvars
+core/tf/*/cdktf.out/stacks/*/plan
+core/tf/*/.env

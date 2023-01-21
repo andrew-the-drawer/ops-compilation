@@ -46,7 +46,7 @@ export class ClusterSecurityGroupConstruct extends Construct {
       egress: allowOutboundTrafficEgressRule,
     });
     this.ecsSvcSg = new securityGroup.SecurityGroup(this, 'ecs-svc-sg', {
-      name: config.albSgName,
+      name: config.ecsSvcSgName,
       vpcId: config.vpcId,
       description: `SG for ECS service in the project`,
       ingress: [

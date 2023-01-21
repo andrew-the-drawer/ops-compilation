@@ -23,6 +23,7 @@ export class MainConstruct extends CdkTfMainConstruct {
       albName,
       subnetIds,
       dnsNamespaceName,
+      albCertDomain,
     } = this.getInput();
 
     this.clusterConstruct = new EcsClusterConstruct(this, 'ecs-cluster', {
@@ -31,6 +32,7 @@ export class MainConstruct extends CdkTfMainConstruct {
 
     this.dataSrcConstruct = new DataSourceConstruct(this, 'data-src', {
       vpcId: vpcId.value,
+      albCertDomain: albCertDomain.value,
     });
 
     this.securityGroupConstruct = new ClusterSecurityGroupConstruct(
@@ -48,6 +50,7 @@ export class MainConstruct extends CdkTfMainConstruct {
       albName: albName.value,
       subnetIds: subnetIds.value,
       securityGroupIds: [this.securityGroupConstruct.albSg.id],
+      certArn: this.dataSrcConstruct.albDefaultCert.arn,
     });
 
     this.svcDiscoveryConstruct = new ServiceDiscoveryConstruct(
@@ -91,6 +94,11 @@ export class MainConstruct extends CdkTfMainConstruct {
       dnsNamespaceName: new TerraformVariable(this, 'dnsNamespaceName', {
         type: 'string',
         description: 'Name of private DNS/Service discovery namespace',
+      }),
+      albCertDomain: new TerraformVariable(this, 'albCertDomain', {
+        type: 'string',
+        description:
+          'HTTPS cert domain (used to search for ACM cert applied to ALB)',
       }),
     };
   }
