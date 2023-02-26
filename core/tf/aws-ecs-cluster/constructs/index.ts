@@ -1,6 +1,6 @@
 import { TerraformOutput, TerraformVariable, VariableType } from 'cdktf';
 import { Construct } from 'constructs';
-import { CdkTfMainConstruct } from '../../../ts/cdktf-main-construct';
+import { CdkTfMainConstruct } from '../../../lib/cdktf-main-construct';
 import { EcsClusterConstruct } from './cluster';
 import { DataSourceConstruct } from './data';
 import { ALBConstruct } from './load-balancer';

@@ -16,6 +16,7 @@
   "license": "MIT",
   "devDependencies": {
     "@commitlint/config-conventional": "^17.4.2",
+    "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.191",
     "@types/minimist": "^1.2.2",
     "commitlint": "^17.4.2",
@@ -24,9 +25,12 @@
     "prettier": "^2.8.3"
   },
   "dependencies": {
+    "aws-sdk": "^2.1304.0",
     "cdktf": "^0.14.3",
     "cdktf-cli": "^0.14.3",
     "constructs": "^10.1.224",
+    "handlebars": "^4.7.7",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "minimist": "^1.2.7",
     "ts-node": "^10.9.1",

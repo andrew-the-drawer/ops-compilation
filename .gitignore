@@ -42,3 +42,9 @@ core/tf/*/cdktf.out/stacks/*/.terraform/
 core/tf/*/cdktf.out/stacks/*/terraform.tfvars
 core/tf/*/cdktf.out/stacks/*/plan
 core/tf/*/.env
+core/tf/*/.terraform/
+core/tf/*/.terraform.tfstate.lock.info
+core/tf/*/terraform.tfstate*
+core/tf/*/stack/.terraform/
+core/tf/*/stacks/*/.terraform/
+core/tf/*/stacks/*/.output/

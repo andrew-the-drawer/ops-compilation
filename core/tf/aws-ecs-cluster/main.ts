@@ -1,6 +1,6 @@
 import { App, S3Backend } from 'cdktf';
 import { Construct } from 'constructs';
-import { CdkTfStack, ICdkTfStackConfig } from '../../ts/cdktf-stack';
+import { CdkTfStack, ICdkTfStackConfig } from '../../lib/cdktf-stack';
 import { provider } from './.gen/providers/aws';
 import { MainConstruct } from './constructs';
 

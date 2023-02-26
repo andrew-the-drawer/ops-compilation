@@ -1,0 +1,108 @@
+---
+containerDefinitions:
+  - dnsSearchDomains:
+    environmentFiles:
+    logConfiguration:
+      logDriver: awslogs
+      secretOptions:
+      options:
+        awslogs-group: {{cwlGroup}}
+        awslogs-region: {{awsRegion}}
+        awslogs-stream-prefix: ecs
+    entryPoint:
+    portMappings:
+      - hostPort: 80
+        protocol: tcp
+        containerPort: 80
+    command:
+    linuxParameters:
+    cpu: 256
+    environment: # filled both with name and value
+      - name: SERVER_HOSTNAME
+        value: pms-platform.sensorflow.cloud
+      - name: SERVER_PORT
+        value: '80'
+      - name: SERVER_PROTOCOL
+        value: http
+      - name: LOGGER_FORMATTER
+        value: json
+      - name: SOFTWARE_DB_SSL_OPT
+        value: '{"rejectUnauthorized": false}'
+      - name: SOFTWARE_DB_LOG_ENABLED
+        value: 'false'
+      - name: SOFTWARE_DB_SYNC_ENABLED
+        value: 'false'
+      - name: SURVEY_MONKEY_WEBHOOK_URL
+        value: https://pms-platform.sensorflow.cloud/api/pms/webhook/eod-surveys/survey-monkey
+      - name: ORACLE_SF_EXTERNAL_SYSTEM_CODE
+        value: SENSOR
+      - name: ORACLE_GATEWAY_BASE_URL
+        value: https://ocr2-demo-oc.hospitality-api.us-ashburn-1.ocs.oc-test.com
+      - name: REDIS_HOST
+        value: redis-general.e4trxt.ng.0001.apse1.cache.amazonaws.com
+      - name: REDIS_PORT
+        value: '6379'
+      - name: REDIS_OPTIONS
+        value: '{"enableReadyCheck": false,"maxRetriesPerRequest": null}'
+      - name: MEWS_API_BASE_URL
+        value: https://api.mews-demo.com
+      - name: MEWS_SF_CLIENT_NAME
+        value: Sensorflow-SmartAlloc
+      - name: NEWRELIC_APP_NAME
+        value: api-sf-pms-dev
+      - name: NEWRELIC_ENABLED
+        value: 'true'
+      - name: SOLITAIRE_PROPERTY_ID
+        value: Solitaire Bangkok - Main Building
+      - name: COMANCHE_LEGACY_TARGETED_READ_EMAILS
+        value: '["trung.nguyen@mission.plus", "travis.nguyen@mission.plus", "night.mgr@solitairebangkok.com"]'
+      - name: COMANCHE_LEGACY_TARGETED_SEND_EMAILS
+        value: '["trung.nguyen@mission.plus"]'
+      - name: COMANCHE_LEGACY_BCC_SEND_EMAILS
+        value: '["travis.nguyen@mission.plus", "jose@sensorflow.org"]'
+    resourceRequirements:
+    ulimits:
+    dnsServers:
+    mountPoints: []
+    workingDirectory:
+    secrets: # filled only with value, the scripts will automatically add reference to SSM
+      - name: AWS_ACCESS_KEY_ID 
+      - name: AWS_SECRET_ACCESS_KEY
+      - name: ALGO_STEP_FUNC_ARN
+      - name: SOFTWARE_DB_URI
+      - name: SURVEY_MONKEY_MAIN_ACCESS_TOKEN
+      - name: KMS_AWS_ACCESS_KEY_ID
+      - name: KMS_AWS_SECRET_ACCESS_KEY
+      - name: CRED_ENC_KMS_KEY_ID
+      - name: ORACLE_CLIENT_ID
+      - name: ORACLE_CLIENT_SECRET
+      - name: ORACLE_SF_APP_KEY
+      - name: BE_USERNAME
+      - name: BE_PASSWORD
+      - name: NEWRELIC_LICENSE_KEY
+      - name: GCP_TOKEN_BASE64_CRED
+      - name: GCP_OAUTH_CLIENT_ID
+      - name: GCP_OAUTH_CLIENT_SECRET
+    dockerSecurityOptions:
+    memory: 512
+    memoryReservation:
+    volumesFrom: []
+    stopTimeout:
+    image: {{ltsImage}}
+    startTimeout:
+    firelensConfiguration:
+    dependsOn:
+    disableNetworking:
+    interactive:
+    healthCheck:
+    essential: true
+    links:
+    hostname:
+    extraHosts:
+    pseudoTerminal:
+    user:
+    readonlyRootFilesystem:
+    dockerLabels:
+    systemControls:
+    privileged:
+    name: {{mainContainerName}}
